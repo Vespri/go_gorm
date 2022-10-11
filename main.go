@@ -14,7 +14,9 @@ func main() {
 
 	// createUser("kresna@gmail.com")
 	// getUserById(1)
-	updateUserByID(1, "vespri@gmail.com")
+	// updateUserByID(1, "vespri@gmail.com")
+	// createProduct(1, "Kijang", "Innova")
+	getUsersWithProducts()
 }
 
 func createUser(email string) {
@@ -64,4 +66,39 @@ func updateUserByID(id uint, email string) {
 		return
 	}
 	fmt.Printf("Update user's email : %+v \n", user.Email)
+}
+
+func createProduct(userID uint, brand string, name string) {
+	db := database.GetDB()
+
+	Product := models.Product{
+		UserID: userID,
+		Brand:  brand,
+		Name:   name,
+	}
+
+	err := db.Create(&Product).Error
+
+	if err != nil {
+		fmt.Println("Error creating product data :", err.Error())
+		return
+	}
+
+	fmt.Println("New Product Data :", Product)
+}
+
+func getUsersWithProducts() {
+	db := database.GetDB()
+
+	users := models.User{}
+
+	err := db.Preload("Products").Find(&users).Error
+
+	if err != nil {
+		fmt.Println("Error getting user datas with products :", err.Error())
+		return
+	}
+
+	fmt.Println("User Datas With Products")
+	fmt.Printf("%+v", users)
 }
